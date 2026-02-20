@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +14,8 @@ public class PlayerControllerExam05 : MonoBehaviour
     public int maxBulletCount = 10;
     public float bulletRegenerateCooldown = 1f;
     // ...
+    public int currentBullet = 0;
+    public float nextTimeRegenBullet = 0f;
 
     private float horizontalInput;
     private InputAction moveAction;
@@ -21,6 +25,7 @@ public class PlayerControllerExam05 : MonoBehaviour
     {
         moveAction = InputSystem.actions.FindAction("Move");
         shootAction = InputSystem.actions.FindAction("Shoot");
+        currentBullet = maxBulletCount;
     }
 
     // Update is called once per frame
@@ -38,9 +43,17 @@ public class PlayerControllerExam05 : MonoBehaviour
             transform.position = new Vector3(xRange, transform.position.y, transform.position.z);
         }
 
-        if (shootAction.triggered)
+        if (shootAction.triggered && currentBullet > 0)
         {
             Instantiate(projectilePrefab, transform.position, transform.rotation);
+            currentBullet -= 1;
+            nextTimeRegenBullet = Time.time + bulletRegenerateCooldown;
         }
+
+        if (Time.time >= nextTimeRegenBullet && currentBullet <= 0)
+        {
+            currentBullet = maxBulletCount;
+        }
+
     }
 }
